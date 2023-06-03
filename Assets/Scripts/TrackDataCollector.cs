@@ -8,6 +8,7 @@ public class TrackDataCollector : MonoBehaviour
     private float[] _groupAmplitudes;
     private float[] _spectrumData;
     private int _groupsize;
+    private bool _bbb;
 
     public static TrackDataCollector Instance;
 
@@ -19,8 +20,11 @@ public class TrackDataCollector : MonoBehaviour
 
     private void Start()
     {
+        _bbb = false;
         _groupsize = 4;     
     }
+
+   
 
     public float GetMusicData()
     {
