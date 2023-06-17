@@ -1,24 +1,32 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 
 public class SongManager : MonoBehaviour
 {
-    private AudioMixerGroup outputMixerGroup;
+    //private AudioMixerGroup outputMixerGroup;
     private int sampleSize;
     private int numBins = 12; // Количество музыкальных нот (полутонов) для определения
 
     private AudioSource audioSource;
+    private string[] _noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
     private float[] spectrum;
     private float sampleRate;
     private float binSize;
-    private float _timer;
+    private int[] _notes;
+    private float _lastFrequency;
 
     private bool _firstEnnabled;
 
-    void Start()
+    public static SongManager Instance;
+
+    private void Awake()
     {
-        _timer = 0.0f;
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        _notes = new int[12];
+ 
         audioSource = GetComponent<AudioSource>();
         _firstEnnabled = false;
     }
@@ -27,7 +35,6 @@ public class SongManager : MonoBehaviour
     {        
         if (audioSource.isPlaying)
         {
-            _timer += Time.deltaTime;
             if (!_firstEnnabled)
             {
                 sampleSize = 8192;
@@ -39,20 +46,18 @@ public class SongManager : MonoBehaviour
 
                 _firstEnnabled = true;
             }
-            GetData();
         }      
     }
 
-    private void GetData()
+    public int GetData()
     {        
-        if (spectrum != null && _timer >= 0.5f)
+        if (spectrum != null)
         {
             audioSource.GetSpectrumData(spectrum, 0, FFTWindow.Hamming);
-
-            
+          
             float maxMagnitude = 0f;
             int maxIndex = 0;
-
+            int returnIndex = 0;
             for (int i = 0; i < spectrum.Length; i++)
             {
                 float magnitude = spectrum[i];
@@ -69,17 +74,22 @@ public class SongManager : MonoBehaviour
             float semitoneOffset = 440f / semitoneRatio; // Нота A4 соответствует 440 Гц
 
             float semitoneDistance = Mathf.Log(frequency / semitoneOffset, semitoneRatio);
-            int noteIndex = Mathf.RoundToInt(semitoneDistance);
+            int noteIndex = Mathf.RoundToInt(semitoneDistance);           
             
-            string[] noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
             int octave = 4 + noteIndex / 12; 
-            if (noteIndex % 12 < noteNames.Length && noteIndex >= 0)
+            if (noteIndex % 12 < _noteNames.Length && noteIndex >= 0)
             {
-                string noteName = noteNames[noteIndex % 12];
-                Debug.Log("Frequency: " + frequency + " Hz");
-                Debug.Log("Note: " + noteName + octave);              
+                string noteName = _noteNames[noteIndex % 12];
+                _notes[noteIndex % 12]+=1;
+                returnIndex = noteIndex % 12;
             }
-            _timer = 0.0f;
+            return returnIndex;
         }
+        return -1;        
+    }
+
+    public int GetSpawnPosition()
+    {
+        return GetData()/4;
     }
 }

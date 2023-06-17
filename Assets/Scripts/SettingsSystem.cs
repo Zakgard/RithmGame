@@ -5,17 +5,23 @@ public class SettingsSystem : MonoBehaviour
 {
     public static float VolumeLevel;
 
-    [SerializeField] private Slider _volumeSlider;
+    [SerializeField] private Toggle _musicToggle;
 
     private void Start()
     {
         VolumeLevel = .5f;
-        _volumeSlider.value = VolumeLevel;
     }
 
     public void OnValueChange()
     {
-        VolumeLevel = _volumeSlider.value;
-        MenuAudioSystem.instance.SetVolume(VolumeLevel);
+        if(_musicToggle.isOn)
+        {
+            MenuAudioSystem.instance.SetVolume(VolumeLevel);
+        }
+        else
+        {
+            MenuAudioSystem.instance.SetVolume(0.0f);
+        }
+        
     }
 }

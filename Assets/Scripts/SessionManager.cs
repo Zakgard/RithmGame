@@ -11,8 +11,8 @@ public class SessionManager : MonoBehaviour
     [SerializeField] private Slider _pointsSlider;
     [SerializeField] private TMP_Text _finalScoreText;
     [SerializeField] private List<GameObject> _stars;
-    [SerializeField] private List<PoiintsFoStars> _pointsFoStars;
-    [SerializeField] private int _pointsMultiplier;
+    
+    
     [SerializeField] private GameObject _gameOverUI;
     [SerializeField] private GameObject _gameWinUI;
     [SerializeField] private GameObject _progressionBar;
@@ -28,6 +28,7 @@ public class SessionManager : MonoBehaviour
     private int _currentStar;
     private float _currentScore;
     private int _index;
+    private float[]_pointsArray;
 
     public Action OnGameLost;
     public Action OnGameWon;
@@ -62,6 +63,7 @@ public class SessionManager : MonoBehaviour
         IsWon = false;
         IsStarted = false;
         ObjectsOnscene = new List<GameObject>();
+        _pointsArray = new float[3];
         
         OnGetPoints += SetPointsValue;
         OnGameLost += ShowGameOver;
@@ -72,8 +74,20 @@ public class SessionManager : MonoBehaviour
         OnGameWon += DisableStarsProgress;
         OnGameWon += ShowGameWon;
 
-        _index = Conductor.LevelIndex;
-        _maxPoints = _pointsFoStars[_index].PointsToStars[2];
+        if(Conductor.Instance != null)
+        {
+            _index = Conductor.LevelIndex;
+            Conductor.Instance.SpawnLevel();
+            _maxPoints = Conductor._shorts.Count + Conductor._longs.Count * 3;
+            Debug.Log(_maxPoints);
+            _pointsSlider.maxValue = _maxPoints *.995f;
+
+            for (int i = 0; i < 3; i++)
+            {
+                _pointsArray[i] = _pointsSlider.maxValue * ((i + 1.0f) / 3.0f);
+                Debug.Log(_pointsArray[i]);
+            }
+        }      
     }
 
     private void OnDestroy()
@@ -93,7 +107,7 @@ public class SessionManager : MonoBehaviour
         if(Points >= _maxPoints)
             Points = _maxPoints;
 
-        if (_currentStar < _stars.Count && Points >= _pointsFoStars[_index].PointsToStars[_currentStar] && _slider.value >= _pointsFoStars[_index].PointsToStars[_currentStar])
+        if (_currentStar < _stars.Count && Points >= _pointsArray[_currentStar] && _slider.value >= _pointsArray[_currentStar])
         {           
             SpawnStar();
             _currentStar++;
@@ -128,7 +142,7 @@ public class SessionManager : MonoBehaviour
     private IEnumerator GameWon()
     {
         DisableStarsProgress();
-        RemoveObjectsFromScene();       
+        RemoveObjectsFromScene();
         yield return new WaitForSeconds(_endDelay);
         AudioManager.Instance.StopMusic();
         IsWon = true;        
@@ -141,7 +155,6 @@ public class SessionManager : MonoBehaviour
         AudioManager.Instance.StopMusic();
     }
 
-
     public void ShowGameOver()
     {        
         GoToPause();               
@@ -153,24 +166,22 @@ public class SessionManager : MonoBehaviour
         _gameOverUI.SetActive(false);
         _gameWinUI.SetActive(true);
 
-        for(int i = 0; i < _pointsFoStars[_index].PointsToStars.Length; i++)
+        for(int i = 0; i < _pointsArray.Length; i++)
         {
-            if(Points >= _pointsFoStars[_index].PointsToStars[i])
+            if(Points >= _pointsArray[i])
             {
                 _starsGO[i].SetActive(true);               
             }
         }
-
         GoToPause();
     }
 
     public void SetPointsValue()
-    {
-        _pointsSlider.maxValue = _maxPoints;
-        _currentScore = _pointsMultiplier * Points;
+    {      
         _streak++;
         _streakText.text = $"X {_streak} !";
         AnimationSystem.Instance.ActiveStreak();
+        _currentScore = Points;
     }
 
     private void SpawnStar()
@@ -189,11 +200,8 @@ public class SessionManager : MonoBehaviour
     private void RemoveObjectsFromScene()
     {
         _progressionBar.SetActive(false);
-        for (int i = 0; i <= ObjectsOnscene.Count - 1; i++)
-        {
-            if (ObjectsOnscene[i] != null)
-                ObjectsOnscene[i].SetActive(false);
-        }
+        Conductor._longs.Clear();
+        Conductor._shorts.Clear();
     }
 
     private void DisableStarsProgress()

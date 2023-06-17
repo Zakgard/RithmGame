@@ -3,13 +3,19 @@ using UnityEngine;
 public class PianoKeySystem : MonoBehaviour
 {
     [SerializeField] private int _pointsPerRightClick;
-    [SerializeField] private bool _isTest;
+    public bool isTest;
+    [SerializeField] private bool _isImmmortal;
 
     public bool isBig;
+    public float timeToHold;
     private bool _isOnPointsState;
+    private float _speed;
 
     private void Start()
     {
+        float size = GetComponent<BoxCollider2D>().bounds.size.y;
+        _speed = GetComponent<PianoKeyMovement>()._movementSpeed;
+        timeToHold = size / _speed;
         _isOnPointsState = false;
     }
 
@@ -20,30 +26,27 @@ public class PianoKeySystem : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        Destroy(gameObject);
+        if(!_isImmmortal) Destroy(gameObject);
     }
 
     private void OnDestroy()
     {
-        if (isBig)
+        if (SessionManager.IsStarted)
         {
-            InputSystem.instance.DestroyLine();
-           // StopCoroutine(InputSystem.Instance.WriteLine(Vector2.zero));
-        }
-        if (!SessionManager.IsClicked && !_isTest)
-        {
-            SessionManager.IsLost= true;
-            SessionManager.Instance.OnGameLost?.Invoke();
-        }
-        else
-        {
-            if(_isOnPointsState)
+            if (!SessionManager.IsClicked && !isTest)
             {
-                SessionManager.Points += _pointsPerRightClick;
-                SessionManager.Instance.OnGetPoints?.Invoke();
+                SessionManager.IsLost = true;
+                SessionManager.Instance.OnGameLost?.Invoke();
             }
-        }
-        SessionManager.ObjectsOnscene[SessionManager.ObjectsOnscene.IndexOf(gameObject)] = null;
-        SessionManager.IsClicked = false;
+            else
+            {
+                if (_isOnPointsState)
+                {
+                    SessionManager.Points += _pointsPerRightClick;
+                    SessionManager.Instance.OnGetPoints?.Invoke();
+                }
+            }
+            SessionManager.IsClicked = false;           
+        }        
     }
 }

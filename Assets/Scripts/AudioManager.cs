@@ -3,30 +3,24 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance;
-    
+    public static AudioManager Instance;  
 
-     private int _index;
+    private int _index;
     [SerializeField] private bool _isTest;
     [SerializeField] private int _groupsize;
     [SerializeField] private List<AudioClip> _audioClips;
-    [SerializeField] private float _delay;
 
-    private float _time;
-    private bool _isStarted;
+    [SerializeField] private int index;
+    [SerializeField] private List<float> _timeOffsets;
+    [SerializeField] private float _testDelay;
+
     private AudioSource _musicSource;
-
- 
     private float _currentTime;
     private bool _isPlaying;
-
+    private float _delay;
     public static bool IsSliderCompleted;
-
-    private void Start()
-    {
-        _isPlaying = true;
-        _currentTime= 0;
-    }
+    public static bool IsPlaying;
+    
     private void Awake()
     {
         if (Instance == null)
@@ -38,9 +32,28 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        _index = PlayerPrefs.GetInt("MusicIndex");
+        _index = Mathf.RoundToInt(_index / 3.0f); 
+
         _musicSource = GetComponent<AudioSource>();        
     }
 
+    private void Start()
+    {
+        Debug.Log(_index);
+        if (_isTest)
+        {
+            _index = index;
+            _delay = _testDelay;
+        }
+        else
+        {
+            _delay = _timeOffsets[index];
+        }
+        
+        _isPlaying = true;
+        _currentTime = 0;
+    }
 
     private void Update()
     {
@@ -49,13 +62,14 @@ public class AudioManager : MonoBehaviour
             SessionManager.IsWon = true;
         }
 
-        if(_currentTime >= _delay && SessionManager.IsSpawn)
+        if(SessionManager.IsSpawn &&_currentTime >= _delay)
         {
             PlayMusic();
+            Debug.Log(_index);
             _isPlaying = false;
             SessionManager.IsSpawn = false;           
         }
-        else
+        else if(SessionManager.IsSpawn)
         {
             _currentTime += Time.deltaTime;
         }
@@ -63,16 +77,14 @@ public class AudioManager : MonoBehaviour
 
     public void PlayMusic()
     {
-        _musicSource.clip = _audioClips[Conductor.LevelIndex];
+        _musicSource.clip = _audioClips[_index];
         _musicSource.Play();
-        _isStarted= true;
-        AlgorithmSpawner.Instance.SetAmplitudeBouns();
+        IsPlaying = true;
     }
 
     public void StopMusic()
     {
         _musicSource.Stop();
         _musicSource.clip=null;
-        _isStarted= false;
     }   
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,11 +36,25 @@ public class EffectsSystem : MonoBehaviour
     public void SpawnDesctructionEffects(Vector2 position)
     {
         ObjectDestructionEffects.Add(Instantiate(_objectDestructionEffects[Random.Range(0, _objectDestructionEffects.Count)], position, Quaternion.identity));
+       // StartCoroutine(DestoyEffect());
     }
 
-    public void SpawnTouchEffects(GameObject gameObject)
+    public IEnumerator SpawnTouchEffects(GameObject gameObject)
     {
         ObjectDestructionEffects.Add(Instantiate(_touchEffets[Random.Range(0, _touchEffets.Count)], gameObject.transform.position, Quaternion.identity));
+        yield return new WaitForSeconds(2);
+        DestoyEffect();
+    }
+
+    private IEnumerator DestoyEffect()
+    {
+        yield return new WaitForSeconds(2);
+        ObjectDestructionEffects[ObjectDestructionEffects.Count- 1].gameObject.SetActive(false);
+    }
+
+    public void SpawnWonEffects()
+    {
+
     }
 
     public void SpawnStartEffets(GameObject gameObject)

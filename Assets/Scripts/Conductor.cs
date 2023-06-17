@@ -1,36 +1,24 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Conductor : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> _objectsToSpawn;
-    [SerializeField] private float _topBound;
     [SerializeField] private int _timesToLong;
-    [SerializeField] private List<Vector2> _spawnOffsets;
     [SerializeField] private List<int[]> _array;
-    [SerializeField] private List<SubList> _list;
-    [SerializeField] private List<OffsetsList> _offsets;
     [SerializeField] private int _levelIndex;
-    [SerializeField] private List<float> _keysSpawnOffset;
-    [SerializeField] private bool _isWithAlgorithm;
+    [SerializeField] private bool _test;
+    [SerializeField] private List<GameObject> _levelsList;
+    [SerializeField] private List<float> _yOfftest;
      
-    [SerializeField] private bool _isTest;
+    public static bool Test;
     [SerializeField] private float _delayAtTheEnd;
     [SerializeField] private List<float> _speedPerLevel;
 
-    private float _smallAfterSmall;
-    private float _bigAfterBig;
-    private float _bigAfterSmall;
-    private float _smallAfterBig;
+    public static List<GameObject> _shorts;
+    public static List<GameObject> _longs;
 
     public static int LevelIndex;
-    private int _songIndex;   
-    private int _currentPrefabIndex;
-    private int _index;
-    private float _positionY;
-    private bool _isBig;
     private int _levelIndexFromPrefs;
 
     public static float MovementSpeed;
@@ -45,78 +33,30 @@ public class Conductor : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        _levelIndexFromPrefs = PlayerPrefs.GetInt("MusicIndex");
-
-        if (_isTest)
-        {
-            LevelIndex = _levelIndex;
-            _songIndex = _levelIndex;
-        }
-        else
-        {
-            LevelIndex = _list[_levelIndexFromPrefs].Level;
-            _songIndex = LevelIndex;
-        }
-        MovementSpeed = _speedPerLevel[LevelIndex];
+        _levelIndexFromPrefs = PlayerPrefs.GetInt("MusicIndex");          
     }
 
     private void Start()
     {
-        CurrentGO = null;
-        _index = 0;       
-        _bigAfterSmall = _offsets[LevelIndex].BigAfterSmall;
-        _bigAfterBig = _offsets[LevelIndex].BigAfterBig;
-        _smallAfterBig = _offsets[LevelIndex].SmallAfterBig;
-        _smallAfterSmall = _offsets[LevelIndex].SmallAfterSmall;
+        _shorts= new List<GameObject>();
+        _longs= new List<GameObject>();
 
-        _currentPrefabIndex = 0;
-    }
-    
-    private void Update()
-    {
-        if (SessionManager.IsStarted) 
-        {          
-            if(CurrentGO != null)
-            {
-                _positionY = CurrentGO.transform.position.y;
-                _isBig = CurrentGO.GetComponent<PianoKeySystem>().isBig;
-            }
-            DetecteSpawn();
-        }
-    }
+        Test = _test;
 
-    private void DetecteSpawn()
-    {
-        if (_index == 0)
-            SpawnObject();
-        else if (_index < _list[_songIndex].IsBig.Count && _isBig)
+        if (Test)
         {
-            if (!_list[_songIndex].IsBig[_index] && _positionY + _bigAfterSmall <= _topBound - _spawnOffsets[0].y)
-            {
-                SpawnObject();
-            }
-            else if (_list[_songIndex].IsBig[_index] && _positionY + _bigAfterBig <= _topBound)
-            {
-                SpawnObject();
-            }
-        }
-        else if (_index < _list[_songIndex].IsBig.Count && !_isBig)
-        {
-            if (!_list[_songIndex].IsBig[_index] && _positionY + _smallAfterBig <= _spawnOffsets[0].y)
-            {
-                SpawnObject();
-            }
-            else if (_list[_songIndex].IsBig[_index] && _positionY + _smallAfterSmall <= _topBound)
-            {
-                SpawnObject();
-            }
+            LevelIndex = _levelIndex;
         }
         else
         {
-            IsCompleted = true;
-            StartCoroutine(StopMusicAfterDelay());
+            LevelIndex = _levelIndexFromPrefs;
         }
+
+        MovementSpeed = _speedPerLevel[LevelIndex];
+        CurrentGO = null;
+        
     }
+   
 
     private IEnumerator StopMusicAfterDelay()
     {
@@ -124,37 +64,51 @@ public class Conductor : MonoBehaviour
         AudioManager.Instance.StopMusic();
     }
 
-
-    private void SpawnObject()
+    public void SpawnLevel()
     {
-        int index;
-        if (!_isWithAlgorithm)
+        Instantiate(_levelsList[LevelIndex], new Vector3(0, 10 + _yOfftest[LevelIndex], 0), Quaternion.identity);
+        InsertObjectsInLists();
+
+        if(!Test)
         {
-            index = _list[LevelIndex].SpawnIndex[_index];
-            Spawn(index);
+            if(_shorts != null && _longs != null)
+               UnTest();
         }
         else
         {
-            index = AlgorithmSpawner.Instance.SpawnWIthAlgorithm();
-            Spawn(index);
-            Debug.Log(index);
+            EnableTest();
         }
     }
 
-    private void Spawn(int index)
+    private void InsertObjectsInLists()
     {
-        if (_list[LevelIndex].IsBig[_index])
+        _shorts.AddRange(GameObject.FindGameObjectsWithTag("short"));
+        _longs.AddRange(GameObject.FindGameObjectsWithTag("long"));
+    }
+
+    private void UnTest()
+    {
+        for(int i = 0; i < _shorts.Count; i++)
         {
-            _currentPrefabIndex = 1;
-        }
-        else
-        {
-            _currentPrefabIndex = 0;
+            _shorts[i].GetComponent<PianoKeySystem>().isTest = false;
         }
 
-        Vector2 spawnPoint = spawnPoints[index] - _spawnOffsets[_currentPrefabIndex];
-        CurrentGO = Instantiate(_objectsToSpawn[_currentPrefabIndex], spawnPoint, Quaternion.identity);
-        SessionManager.ObjectsOnscene.Add(CurrentGO);
-        _index++;
+        for(int i = 0; i < _longs.Count; i++)
+        {
+            _longs[i].GetComponent<PianoKeySystem>().isTest = false;
+        }
+    }
+
+    private void EnableTest()
+    {
+        for (int i = 0; i < _shorts.Count; i++)
+        {
+            _shorts[i].GetComponent<PianoKeySystem>().isTest = true;
+        }
+
+        for (int i = 0; i < _longs.Count; i++)
+        {
+            _longs[i].GetComponent<PianoKeySystem>().isTest = true;
+        }
     }
 }
