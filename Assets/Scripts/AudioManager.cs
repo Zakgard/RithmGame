@@ -40,7 +40,6 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(_index);
         if (_isTest)
         {
             _index = index;
@@ -65,7 +64,6 @@ public class AudioManager : MonoBehaviour
         if(SessionManager.IsSpawn &&_currentTime >= _delay)
         {
             PlayMusic();
-            Debug.Log(_index);
             _isPlaying = false;
             SessionManager.IsSpawn = false;           
         }

@@ -14,14 +14,12 @@ public class TrackData : MonoBehaviour
     public void SetAuthor(TMP_Text text)
     {
         PlayerPrefs.SetString("Author", text.text);
-        Debug.Log(text.text);
         PlayerPrefs.Save();
     }
 
     public void SetTitle(TMP_Text title)
     { 
         PlayerPrefs.SetString("Title", title.text);
-        Debug.Log(title.text);
         PlayerPrefs.Save();
     }
 }

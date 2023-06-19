@@ -26,7 +26,7 @@ public class BitAnalyzer : MonoBehaviour
         numBits = (int)audioSource.clip.length * bitsBerSec;
 
         float length = audioSource.clip.length;
-        Debug.Log(length);
+
         // Создание массива для хранения игровых объектов битов
         beatBits = new GameObject[numBits];
 
@@ -63,6 +63,5 @@ public class BitAnalyzer : MonoBehaviour
             scale.x = amplitude;
             beatBits[i].transform.localScale = scale;
         }
-        Debug.Log(_speed);
     }
 }

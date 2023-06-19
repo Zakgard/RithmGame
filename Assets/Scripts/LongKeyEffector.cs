@@ -81,6 +81,5 @@ public class LongKeyEffector : MonoBehaviour
             _FillRateValue -= stepSize;
         }
         material.SetFloat("_FillRate", _FillRateValue);
-        Debug.Log(_FillRateValue);
     }
 }

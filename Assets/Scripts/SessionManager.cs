@@ -79,13 +79,11 @@ public class SessionManager : MonoBehaviour
             _index = Conductor.LevelIndex;
             Conductor.Instance.SpawnLevel();
             _maxPoints = Conductor._shorts.Count + Conductor._longs.Count * 3;
-            Debug.Log(_maxPoints);
             _pointsSlider.maxValue = _maxPoints *.995f;
 
             for (int i = 0; i < 3; i++)
             {
                 _pointsArray[i] = _pointsSlider.maxValue * ((i + 1.0f) / 3.0f);
-                Debug.Log(_pointsArray[i]);
             }
         }      
     }
