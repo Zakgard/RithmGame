@@ -15,9 +15,11 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private float _testDelay;
 
     private AudioSource _musicSource;
+    private float _trackTime;
     private float _currentTime;
     private bool _isPlaying;
     private float _delay;
+    private bool _isPaused;
     public static bool IsSliderCompleted;
     public static bool IsPlaying;
     
@@ -40,6 +42,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
+        _isPaused = false;
         if (_isTest)
         {
             _index = index;
@@ -52,6 +55,7 @@ public class AudioManager : MonoBehaviour
         
         _isPlaying = true;
         _currentTime = 0;
+        AudioListener.pause = false;
     }
 
     private void Update()
@@ -82,7 +86,35 @@ public class AudioManager : MonoBehaviour
 
     public void StopMusic()
     {
-        _musicSource.Stop();
-        _musicSource.clip=null;
+        if (_musicSource != null && !_isPaused)
+        {
+            _musicSource.Stop();
+            _musicSource.clip = null;
+            _isPaused = true;
+        }
     }   
+
+    public void OnPauseMusic()
+    {
+        if(_musicSource != null)
+        {
+            _musicSource.Pause();
+            Debug.Log("paused");
+        }      
+    }
+
+    public void OnContinuePlayMusic()
+    {
+        if (_musicSource != null && _isPaused)
+        {
+            _musicSource.UnPause();
+            Debug.Log("continue");
+            _isPaused = false;
+        }
+    }
+
+    public float GetTrackLength()
+    {
+        return _musicSource.clip.length;
+    }
 }

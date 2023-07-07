@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 0.099999994, y: 0.030612854, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6461156116386038785}
+  m_Father: {fileID: 4084700177991461741}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7404869288836151571
@@ -176,7 +176,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6461156116386038785}
+  - component: {fileID: 4084700177991461741}
   - component: {fileID: 3047706449491091749}
   - component: {fileID: 6557713549824417333}
   - component: {fileID: 4843292894994110512}
@@ -191,15 +191,15 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &6461156116386038785
-RectTransform:
+--- !u!4 &4084700177991461741
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6373297769512633807}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.011500001, y: -0.15710068, z: 0}
   m_LocalScale: {x: 2, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -209,11 +209,6 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.1, y: 0}
-  m_SizeDelta: {x: 0.62, y: 1.2}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &3047706449491091749
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -341,8 +336,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pointsPerRightClick: 3
-  isTest: 0
   _isImmmortal: 0
+  isTest: 0
   isBig: 1
   timeToHold: 0
 --- !u!222 &8295149223055098498
@@ -366,7 +361,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _line: {fileID: 8170131904258293764}
-  _circle: {fileID: 5477774092711083409}
   _point: {fileID: 2990941209845458750}
   _progressSteps: 84
   stepSize: 0.1
@@ -400,7 +394,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 794300293785878082}
-  m_Father: {fileID: 6461156116386038785}
+  m_Father: {fileID: 4084700177991461741}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &538078824209706130
@@ -485,8 +479,12 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 6461156116386038785}
+    m_TransformParent: {fileID: 4084700177991461741}
     m_Modifications:
+    - target: {fileID: 387095516499317853, guid: 2ed6aa214f9ccfd46b4c4d50b5bd7aea, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8bb2000db7d083f4ab98c297922c6734, type: 2}
     - target: {fileID: 2308559368724919810, guid: 2ed6aa214f9ccfd46b4c4d50b5bd7aea, type: 3}
       propertyPath: m_Name
       value: CircleEffect
@@ -501,11 +499,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9035366704281006958, guid: 2ed6aa214f9ccfd46b4c4d50b5bd7aea, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9035366704281006958, guid: 2ed6aa214f9ccfd46b4c4d50b5bd7aea, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.029
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 9035366704281006958, guid: 2ed6aa214f9ccfd46b4c4d50b5bd7aea, type: 3}
       propertyPath: m_LocalPosition.x

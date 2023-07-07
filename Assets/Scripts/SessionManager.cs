@@ -11,8 +11,6 @@ public class SessionManager : MonoBehaviour
     [SerializeField] private Slider _pointsSlider;
     [SerializeField] private TMP_Text _finalScoreText;
     [SerializeField] private List<GameObject> _stars;
-    
-    
     [SerializeField] private GameObject _gameOverUI;
     [SerializeField] private GameObject _gameWinUI;
     [SerializeField] private GameObject _progressionBar;
@@ -56,6 +54,7 @@ public class SessionManager : MonoBehaviour
 
     private void Start()
     {
+        Points= 0;
         _streak = 0;
         _currentScore = 0;
         _currentStar = 0;
@@ -64,14 +63,14 @@ public class SessionManager : MonoBehaviour
         IsStarted = false;
         ObjectsOnscene = new List<GameObject>();
         _pointsArray = new float[3];
-        
+
         OnGetPoints += SetPointsValue;
         OnGameLost += ShowGameOver;
         OnGameLost += ShowGameOverPanel;
         OnGameLost += RemoveObjectsFromScene;
         OnGameLost += DisableStarsProgress;
         OnGameWon += RemoveObjectsFromScene;
-        OnGameWon += DisableStarsProgress;
+       // OnGameWon += DisableStarsProgress;
         OnGameWon += ShowGameWon;
 
         if(Conductor.Instance != null)
@@ -97,7 +96,7 @@ public class SessionManager : MonoBehaviour
         OnGameLost -= DisableStarsProgress;
         OnGameWon -= ShowGameWon;
         OnGameWon -= RemoveObjectsFromScene;
-        OnGameWon -= DisableStarsProgress;
+       // OnGameWon -= DisableStarsProgress;
     }
 
     private void Update()
@@ -114,7 +113,7 @@ public class SessionManager : MonoBehaviour
 
         if(_pointsSlider.value < _currentScore)
         {
-            _pointsSlider.value += _sliderMultiplier * Time.deltaTime;
+            _pointsSlider.value += _sliderMultiplier * Time.deltaTime * (1+_pointsSlider.value/_pointsSlider.maxValue);
         }
         
         if(IsWon && _pointsSlider.value <= _currentScore && !AudioManager.IsSliderCompleted)
@@ -127,7 +126,7 @@ public class SessionManager : MonoBehaviour
         
         if(IsWon && AudioManager.IsSliderCompleted)
         {
-            StartCoroutine(GameWon());
+            
         }
     }
 
@@ -137,11 +136,11 @@ public class SessionManager : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private IEnumerator GameWon()
+    public IEnumerator GameWon()
     {
-        DisableStarsProgress();
+       // DisableStarsProgress();
         RemoveObjectsFromScene();
-        yield return new WaitForSeconds(_endDelay);
+        yield return new WaitForSeconds(_endDelay + 1.0f);
         AudioManager.Instance.StopMusic();
         IsWon = true;        
         OnGameWon?.Invoke();
@@ -149,18 +148,20 @@ public class SessionManager : MonoBehaviour
 
     private void GoToPause()
     {
-        Time.timeScale = 0.0f;
-        AudioManager.Instance.StopMusic();
+        AudioManager.Instance.OnPauseMusic();
+        Time.timeScale = 0.0f;      
     }
 
     public void ShowGameOver()
-    {        
+    {
+        AudioManager.Instance.OnPauseMusic();
         GoToPause();               
     }
 
     public void ShowGameWon()
     {      
         _progressionBar.SetActive(false);
+        DisableStarsProgress();
         _gameOverUI.SetActive(false);
         _gameWinUI.SetActive(true);
 
@@ -172,6 +173,13 @@ public class SessionManager : MonoBehaviour
             }
         }
         GoToPause();
+        StartCoroutine(MenuReturnDelay());
+    }
+
+    private IEnumerator MenuReturnDelay()
+    {
+        yield return new WaitForSecondsRealtime(3.0f);
+        ShowInterstitialBeforeMenu();
     }
 
     public void SetPointsValue()
@@ -189,15 +197,19 @@ public class SessionManager : MonoBehaviour
 
     private void ShowGameOverPanel()
     {
-        _progressionBar.SetActive(false);
-        _gameWinUI.SetActive(false);
-        _gameOverUI.SetActive(true);
-        _finalScoreText.text = "Ваши очки: " + Points;
+        if (_progressionBar != null && _gameOverUI != null && _gameOverUI != null)
+        {
+            _progressionBar.SetActive(false);
+            _gameWinUI.SetActive(false);
+            _gameOverUI.SetActive(true);
+        }
+        //_finalScoreText.text = "Ваши очки: " + Points;
     }
 
     private void RemoveObjectsFromScene()
     {
-        _progressionBar.SetActive(false);
+        if(_progressionBar!= null)
+          //  _progressionBar.SetActive(false);
         Conductor._longs.Clear();
         Conductor._shorts.Clear();
     }
@@ -206,7 +218,8 @@ public class SessionManager : MonoBehaviour
     {
         for (int i = 0; i < _stars.Count; i++)
         {
-            _stars[i].SetActive(false);
+            if (_stars[i] != null)
+                 _stars[i].SetActive(false);
         }
     }
 
@@ -219,8 +232,25 @@ public class SessionManager : MonoBehaviour
         IsWon = false;
     }
 
-    public void GoToMainMenu()
+
+    public void OnMenuReturnButtonCLick()
     {
-        SceneManager.LoadScene("MenuScene");
+        ShowInterstitialBeforeMenu();
+    }
+
+    private void ShowInterstitialBeforeMenu()
+    {
+        Debug.Log("beforeShowing");
+        AdManager.Instance.RunInterstitial();       
+    }
+
+    public void GoToTheMenu()
+    {
+        SceneManager.LoadSceneAsync("MenuScene");
+    }
+
+    public void CloseLoseTab()
+    {
+        _gameOverUI.SetActive(false);
     }
 }

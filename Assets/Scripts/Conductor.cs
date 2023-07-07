@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -54,14 +53,13 @@ public class Conductor : MonoBehaviour
 
         MovementSpeed = _speedPerLevel[LevelIndex];
         CurrentGO = null;
-        
     }
-   
 
-    private IEnumerator StopMusicAfterDelay()
+    private void Update()
     {
-        yield return new WaitForSeconds(_delayAtTheEnd);
-        AudioManager.Instance.StopMusic();
+        if(_shorts.Count == 0 && _longs.Count == 0 && SessionManager.IsStarted) {
+            StartCoroutine(SessionManager.Instance.GameWon());
+        }
     }
 
     public void SpawnLevel()

@@ -5,7 +5,12 @@ using System;
 
 public class PlayerPrefsService : IPrefsService
 {
-    public PlayerPrefsService(ICoroutineRunner coroutineRunner) => coroutineRunner.StartCoroutine(SaveOverTime());
+    private readonly ICoroutineRunner _coroutineRunner;
+    public PlayerPrefsService(ICoroutineRunner coroutineRunner)
+    {
+        _coroutineRunner = coroutineRunner;
+        _coroutineRunner.StartCoroutine(SaveOverTime());
+    }
 
     private static IEnumerator SaveOverTime()
     {

@@ -60,7 +60,7 @@ public class YandexPrefsService : IPrefsService
 
     private void ThrowIfDataNotLoaded()
     {
-        if (IsDataLoaded)
+        if (!IsDataLoaded)
         {
             throw new InvalidOperationException();
         }

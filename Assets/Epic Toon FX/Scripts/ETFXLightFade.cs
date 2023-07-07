@@ -9,12 +9,14 @@ namespace EpicToonFX
         public float life = 0.2f;
         public bool killAfterLife = true;
 
+        private float _currentLifeTime;
         private Light li;
         private float initIntensity;
 
         // Use this for initialization
         void Start()
         {
+            _currentLifeTime = 0.0f;
             if (gameObject.GetComponent<Light>())
             {
                 li = gameObject.GetComponent<Light>();
@@ -27,13 +29,14 @@ namespace EpicToonFX
         // Update is called once per frame
         void Update()
         {
-            if (gameObject.GetComponent<Light>())
+            _currentLifeTime = _currentLifeTime + Time.deltaTime;
+           // li.intensity -= initIntensity * (Time.deltaTime / life);
+            if (_currentLifeTime >= life )
             {
-                li.intensity -= initIntensity * (Time.deltaTime / life);
-                if (killAfterLife && li.intensity <= 0)
-                    //Destroy(gameObject);
-					Destroy(gameObject.GetComponent<Light>());
-            }
+                 Destroy(gameObject);
+                 Destroy(gameObject.GetComponent<Light>());
+            }                 
+            
         }
     }
 }

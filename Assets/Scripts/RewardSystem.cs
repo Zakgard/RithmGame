@@ -14,30 +14,27 @@ public class RewardSystem : MonoBehaviour
     {
         try
         {
-            int coins = PlayerPrefs.GetInt("coins");
+            int coins = Game.PreferencesService.GetInt("coins");
             coins += 150;
-            PlayerPrefs.SetInt("coins", coins);
-            PlayerPrefs.Save();
+            Game.PreferencesService.SetInt("coins", coins);
         }
         catch
         {
 
         }
-        SessionManager.Instance.OnGameWon -= GetGoldCoins;
-        
-        
+        SessionManager.Instance.OnGameWon -= GetGoldCoins;            
     }
 
     private void GetStars()
     {
         try
         {
-            int stars = PlayerPrefs.GetInt($"{_levels[Conductor.LevelIndex]}");
+            int stars = Game.PreferencesService.GetInt($"{_levels[Conductor.LevelIndex]}");
             if(stars <= 3)
             {
                 stars = SessionManager.StarsGot;
             }
-            int currentStars = PlayerPrefs.GetInt("stars");
+            int currentStars = Game.PreferencesService.GetInt("stars");
             int starss = SessionManager.StarsGot;
 
             if (stars + SessionManager.StarsGot > 3)
@@ -45,12 +42,8 @@ public class RewardSystem : MonoBehaviour
                 stars = 3;
                 SessionManager.StarsGot = 0;
             }
-
-            
-
-            PlayerPrefs.SetInt($"{_levels[Conductor.LevelIndex]}", stars + SessionManager.StarsGot);
-            PlayerPrefs.SetInt("stars", stars + currentStars);
-            PlayerPrefs.Save();
+            Game.PreferencesService.SetInt($"{_levels[Conductor.LevelIndex]}", stars + SessionManager.StarsGot);
+            Game.PreferencesService.SetInt("stars", stars + currentStars);
         }
         catch
         {

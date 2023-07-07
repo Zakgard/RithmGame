@@ -1,18 +1,23 @@
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PianoKeySystem : MonoBehaviour
 {
     [SerializeField] private int _pointsPerRightClick;
-    public bool isTest;
+    
     [SerializeField] private bool _isImmmortal;
 
+    public bool isTest;
     public bool isBig;
     public float timeToHold;
     private bool _isOnPointsState;
     private float _speed;
+    private bool _isPaused;
 
     private void Start()
     {
+        _isPaused = false;
         float size = GetComponent<BoxCollider2D>().bounds.size.y;
         _speed = GetComponent<PianoKeyMovement>()._movementSpeed;
         timeToHold = size / _speed;
@@ -36,6 +41,7 @@ public class PianoKeySystem : MonoBehaviour
             if (!SessionManager.IsClicked && !isTest)
             {
                 SessionManager.IsLost = true;
+                AudioManager.Instance.OnPauseMusic();
                 SessionManager.Instance.OnGameLost?.Invoke();
             }
             else
@@ -44,6 +50,15 @@ public class PianoKeySystem : MonoBehaviour
                 {
                     SessionManager.Points += _pointsPerRightClick;
                     SessionManager.Instance.OnGetPoints?.Invoke();
+                    if (gameObject.CompareTag("short"))
+                    {
+                        Conductor._shorts.Remove(gameObject);
+                    }
+                    else
+                    {
+                        Conductor._longs.Remove(gameObject);
+                    }
+                    
                 }
             }
             SessionManager.IsClicked = false;           

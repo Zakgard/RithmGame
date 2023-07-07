@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Agava.YandexGames;
+using UnityEngine.SceneManagement;
 
 public class YandexAdvertisingService : IAdvertisingService
 {
@@ -30,28 +29,31 @@ public class YandexAdvertisingService : IAdvertisingService
         _coroutineRunner = coroutineRunner;
     }
 
-    public void ShowInterstitial()
+    public void ShowInterstitial(Action action)
     {
         if (SdkNotWorking)
         {
             Debug.Log("Interstitial shown. But we're not in build");
+            SceneManager.LoadScene("MenuScene");
             return;
         }
         if (IsInterstitialPurchased)
         {
             Debug.Log("Ad block bought");
+            SceneManager.LoadScene("MenuScene");
             return;
         }
+
+        
         InterstitialAd.Show(
-            onOpenCallback: OnOpen,
-            onCloseCallback: _ => OnClosed(),
-            onErrorCallback: _ => OnClosed(),
-            onOfflineCallback: OnClosed);
+            onOpenCallback: OnInterstitialOpen,
+            onCloseCallback: _ => OnInterstitialClose(),
+            onErrorCallback: _ => OnInterstitialErrorClose(),
+            onOfflineCallback: OnInterstitialClose);
     }
 
     public void ShowRewarded(Action onRewarded)
     {
-      //  GameManager.instance.GamePaused = true;
         if (SdkNotWorking)
         {
             Debug.Log("Rewarded shown");
@@ -59,28 +61,51 @@ public class YandexAdvertisingService : IAdvertisingService
             return;
         }
 
-        _onRewarded = onRewarded;
+        _onRewarded = onRewarded;       
 
         VideoAd.Show(
-            onOpenCallback: OnOpen,
+            onOpenCallback: OnVideoOpen,
             onRewardedCallback: OnRewarded,
-            onCloseCallback: OnClosed,
+            onCloseCallback: OnClosed, 
             onErrorCallback: _ => OnClosed());
+    }
+
+    private void OnInterstitialClose()
+    {
+        Debug.Log("Interstitial shown");
+        SceneManager.LoadScene("MenuScene");
+        AdvertisingEnded?.Invoke();
+    }
+
+    private void OnInterstitialErrorClose()
+    {
+        SceneManager.LoadScene("MenuScene");
+        Debug.Log("Error");
     }
 
     private void OnClosed()
     {
-       // GameManager.instance.GamePaused = false;
-        if (_rewarded) _onRewarded?.Invoke();
+        if (_rewarded)
+        {
+            _onRewarded?.Invoke();
+            AdManager.Instance.GoRewardGot();
+        }
         _rewarded = false;
         AdvertisingEnded?.Invoke();
+        AdManager.Instance.GoRewardMissed();
     }
 
     private void OnRewarded() => _rewarded = true;
 
-    private void OnOpen()
-    {
-      //  GameManager.instance.GamePaused = true;
+    private void OnVideoOpen()
+    {  
         AdvertisingStarted?.Invoke();
+    }
+
+    private void OnInterstitialOpen()
+    {
+        Debug.Log("Before invoking");
+        AdvertisingStarted?.Invoke();
+        Debug.Log("After Invoking");
     }
 }

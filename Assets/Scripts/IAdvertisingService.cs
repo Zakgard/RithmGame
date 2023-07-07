@@ -2,6 +2,6 @@
 
 public interface IAdvertisingService
 {
-    public void ShowInterstitial();
+    public void ShowInterstitial(Action action);
     public void ShowRewarded(Action action);
 }

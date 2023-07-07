@@ -25,19 +25,6 @@ public class MenuAudioSystem : MonoBehaviour
         _audioSource.volume = .5f;
     }
 
-    private void Update()
-    {
-        if(Input.GetMouseButton(0))
-        {
-             PlayEffectSound();
-        }
-
-        if (Input.touchCount > 0)
-        {
-            PlayEffectSound();
-        }
-    }
-
     public void OnPlayMusicButtonClick(int index)
     {
         if(_lastBUtton != null)
@@ -56,7 +43,7 @@ public class MenuAudioSystem : MonoBehaviour
         _audioSource.volume = volume;
     }
 
-    private void PlayEffectSound()
+    public void PlayEffectSound()
     {
         _bubleSource.Play();
     }

@@ -2,30 +2,35 @@ using System.Collections;
 using UnityEngine;
 using Agava.YandexGames;
 using UnityEngine.SceneManagement;
-using System;
 
-public class Initializer : MonoBehaviour
+public class Initializer : MonoBehaviour, ICoroutineRunner
 {
-    public static ICoroutineRunner coroutineRunner;
+    public static ICoroutineRunner Instance;
+
     private void Awake()
     {
         YandexGamesSdk.CallbackLogging = true;
+        Instance = this;
     }
 
     private IEnumerator Start()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
-        var prefsP = new PlayerPrefsService(coroutineRunner);
-        //  Game.AdvertisingService = new FakeService(coroutineRunner, prefsP);
-        Game.PreferencesService = prefsP;
+        var Service = new PlayerPrefsService(Instance);
+        Game.AdvertisingService = new YandexAdvertisingService(Instance, Service);
+        Game.PreferencesService = Service;
+        Debug.Log("not Authorised");
         SceneManager.LoadScene("MenuScene");
         yield break;
-#endif       
+#else
         yield return YandexGamesSdk.Initialize();
-        var prefsY = new YandexPrefsService(coroutineRunner);
-        yield return new WaitUntil(() => prefsY.IsDataLoaded);
-        Game.AdvertisingService = new YandexAdvertisingService(coroutineRunner, prefsY);
-        Game.PreferencesService = prefsY;
+        var Service = new YandexPrefsService(Instance);
+        yield return new WaitUntil(() => Service.IsDataLoaded);
+        Game.AdvertisingService = new YandexAdvertisingService(Instance, Service);
+        Game.PreferencesService = Service;
+        Debug.Log("Authorised");
         SceneManager.LoadScene("MenuScene");
+        yield break;
+#endif
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class LongKeyEffector : MonoBehaviour
 {
     [SerializeField] private GameObject _line;
-    [SerializeField] private GameObject _circle;
+   // [SerializeField] private GameObject _circle;
     [SerializeField] private GameObject _point;
     private Vector2 _finalPoint;
     private float _speed;
@@ -26,7 +26,7 @@ public class LongKeyEffector : MonoBehaviour
         _size = transform.localScale.y;
         _lineTransform = _line.transform;
         _originalLineScale = _lineTransform.localScale;
-        _circle.transform.localScale = new Vector2(_circle.transform.localScale.x, _circle.transform.localScale.y * 7 / _size);
+      //  _circle.transform.localScale = new Vector2(_circle.transform.localScale.x, _circle.transform.localScale.y * 7 / _size);
         _speed = GetComponent<PianoKeyMovement>()._movementSpeed;
         _progressSteps = (_progressSteps/ _speed * 10) / (14.0f / _size);
         material = GetComponent<Renderer>().material;
@@ -37,12 +37,12 @@ public class LongKeyEffector : MonoBehaviour
         material.SetFloat("_FillRate", _FillRateValue);
         stepSize = (2*_progressBorder) / _progressSteps;
 
-        _finalPoint.y = GetComponent<RectTransform>().rect.yMax;
+     //   _finalPoint.y = GetComponent<RectTransform>().rect.yMax;
         _xPos = transform.position.x;
         _FillRateValue = -.6f;
     }
 
-    private void Update()
+   /* private void Update()
     {
         if (_circle.active)
         {
@@ -66,7 +66,7 @@ public class LongKeyEffector : MonoBehaviour
         {
             _circle.SetActive(false);
         }
-    }
+    }*/
 
     public void ChangeValue(bool isIncrease, float extraIncrease)
     {

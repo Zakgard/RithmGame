@@ -74,7 +74,7 @@ public class InputSystem : MonoBehaviour
                 _isHolding = false;
                 if (_effector != null)
                 {
-                    _effector.UnHold();
+                    //_effector.UnHold();
                 }
                 SessionManager.Instance.DestroyPianoKey(true, _currnetTarget);
                 _currentholdingTime= 0;
@@ -102,7 +102,7 @@ public class InputSystem : MonoBehaviour
                 _effector = _currnetTarget.GetComponent<LongKeyEffector>();
                 if(_effector != null)
                 {
-                    _effector.Hold(hit.point);
+                    //_effector.Hold(hit.point);
                 }               
                 _currentholdingTime = 0f;
                 _effector.ChangeValue(true, .1f);
